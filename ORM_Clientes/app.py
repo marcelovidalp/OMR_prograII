@@ -1,4 +1,5 @@
 import customtkinter as ctk
+from customtkinter import messagebox
 import sqlalchemy 
 
 # Definición de la clase principal de la aplicación

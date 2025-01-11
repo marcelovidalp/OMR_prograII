@@ -1,8 +1,9 @@
-from sql_alchemyORM import session, Menu
+from sqlalchemy import session
+from ..object_creator import crear_menu
 
 # Función para ver todos los menús
 def ver_menus():
-    menus = session.query(Menu).all()
+    menus = session.query(crear_menu()).all()
     if menus:
         for menu in menus:
             print(menu)
@@ -11,7 +12,7 @@ def ver_menus():
 
 # Función para agregar un nuevo menú
 def agregar_menu():
-    menu = Menu()
+    menu = crear_menu()
     menu.nombre = input("Ingrese el nombre del menu: ")
     menu.precio = float(input("Ingrese el precio del menu: "))
     session.add(menu)
@@ -22,7 +23,7 @@ def agregar_menu():
 def modificar_menu():
     ver_menus()
     id_menu = int(input("Ingrese el ID del menu a modificar: "))
-    menu = session.query(Menu).get(id_menu)
+    menu = session.query(crear_menu()).get(id_menu)
     if menu:
         menu.nombre = input("Ingrese el nuevo nombre del menu: ")
         menu.precio = float(input("Ingrese el nuevo precio del menu: "))
@@ -35,7 +36,7 @@ def modificar_menu():
 def borrar_menu():
     ver_menus()
     id_menu = int(input("Ingrese el ID del menu a borrar: "))
-    menu = session.query(Menu).get(id_menu)
+    menu = session.query(crear_menu()).get(id_menu)
     if menu:
         session.delete(menu)
         session.commit()
