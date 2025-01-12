@@ -1,11 +1,10 @@
 from factory import ClienteFactory
 from models import Cliente
-
+from crud_base import CRUDBase
 #en el linux no se instala con pip install customtkinter
 from sqlalchemy.orm import Session
 
-
-class ClienteCRUD:
+class ClienteCRUD(CRUDBase):
     @staticmethod
     def crear_cliente():
         return ClienteFactory().crear_objeto()
@@ -20,13 +19,13 @@ class ClienteCRUD:
             print("No hay clientes registrados")
 
     @staticmethod
-    def update_cliente(self, session: Session, cliente: Cliente):
+    def update_cliente(session: Session, cliente: Cliente):
         session.add(cliente)
         session.commit()
         print("Cliente actualizado correctamente")
     
     @staticmethod
-    def delete_cliente(self, session: Session, cliente: Cliente):
+    def delete_cliente(session: Session, cliente: Cliente):
         session.delete(cliente)
         session.commit()
         print("Cliente eliminado correctamente")
