@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 
 class CRUDBase(ABC):
     @abstractmethod
-    def ver(self, db: Session):
+    def leer(self, db: Session):
         pass
 
     @abstractmethod

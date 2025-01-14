@@ -6,18 +6,18 @@ class Factory(ABC):
     def crear_objeto(self):
         pass
 
-class ClienteFactory(Factory):
-    def crear_objeto(self):
+class ClienteFactory(Factory): 
+    def crear_objeto(self) -> Cliente:
         return Cliente()
 
 class PedidoFactory(Factory):
-    def crear_objeto(self):
+    def crear_objeto(self)-> Pedido:
         return Pedido()
 
 class IngredientesFactory(Factory):
-    def crear_objeto(self):
+    def crear_objeto(self) -> Ingredientes:
         return Ingredientes()
 
 class MenuFactory(Factory):
-    def crear_objeto(self):
+    def crear_objeto(self) -> Menu:
         return Menu()

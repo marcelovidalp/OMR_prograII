@@ -1,18 +1,22 @@
-from sqlalchemy import Column, Integer, String, ForeignKey
-from sqlalchemy.orm import relationship
-from sqlalchemy.orm import mapped_column
-from sqlalchemy.orm import Mapped
+from sqlalchemy import Column, Integer, String, ForeignKey, Table
+from sqlalchemy.orm import relationship, Mapped, mapped_column
 from .database import Base
+
+# Tabla de asociación para la relación muchos a muchos entre Pedido y Ingredientes
+pedido_ingredientes = Table(
+    'pedido_ingredientes', Base.metadata,
+    Column('pedido_id', Integer, ForeignKey('Pedidos.id'), primary_key=True),
+    Column('ingrediente_id', Integer, ForeignKey('Ingredientes.id'), primary_key=True)
+)
 
 # Definición de la clase Cliente que representa la tabla "Clientes"
 class Cliente(Base):
     __tablename__ = "Clientes"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    nombre: Mapped[str] = mapped_column(index=True)
-    apellido: Mapped[str] = mapped_column(String(30),index=True)
+    nombre: Mapped[str] = mapped_column(index=True, unique=True)
     email: Mapped[str] = mapped_column(String(50), index=True, unique=True)
-    telefono: Mapped[str] = mapped_column(String(15), index=True)
-    pedidos = relationship("Pedido", back_populates="cliente")# relación uno a muchos con la tabla "Pedidos"
+
+    pedidos = relationship("Pedido", back_populates="cliente")  # relación uno a muchos con la tabla "Pedidos"
 
 # Definición de la clase Pedido que representa la tabla "Pedidos"
 class Pedido(Base):
@@ -21,19 +25,23 @@ class Pedido(Base):
     cliente_id: Mapped[int] = mapped_column(Integer, ForeignKey("Clientes.id"))
     descripcion: Mapped[str] = mapped_column(String(100), index=True)
     monto: Mapped[int] = mapped_column(Integer, index=True)
-    
+
+    cliente = relationship("Cliente", back_populates="pedidos")  # relación inversa con la tabla "Clientes"
+    ingredientes = relationship("Ingredientes", secondary=pedido_ingredientes, back_populates="pedidos")  # relación muchos a muchos con la tabla "Ingredientes"
 
 # Definición de la clase Ingredientes que representa la tabla "Ingredientes"
 class Ingredientes(Base):
     __tablename__ = "Ingredientes"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
-    nombre: Mapped[str] = mapped_column(String(50), index=True)
-    precio: Mapped[str] = mapped_column(Integer, index=True)
-    menus = relationship("Menu", back_populates="ingredientes")# relación uno a muchos con la tabla "Menu"
+    nombre: Mapped[str] = mapped_column(String(50), index=True, unique=True)
+    precio: Mapped[int] = mapped_column(Integer, index=True)
+
+    pedidos = relationship("Pedido", secondary=pedido_ingredientes, back_populates="ingredientes")  # relación muchos a muchos con la tabla "Pedidos"
 
 # Definición de la clase Menu que representa la tabla "Menu"
 class Menu(Base):
     __tablename__ = "Menu"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
+    nombre: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     descripcion: Mapped[str] = mapped_column(String(100), index=True)
     precio: Mapped[int] = mapped_column(Integer, index=True)

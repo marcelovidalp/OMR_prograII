@@ -1,4 +1,19 @@
-from sqlalchemy import session, Menu
+from sqlalchemy import Session, Menu
+from models import Menu
+from crud_base import CRUDBase
+from factory import MenuFactory
+
+class MenuCRUD(CRUDBase):
+    def __init__(self):
+        self.factory = MenuFactory()
+
+    def leer(self, db: Session):
+        return db.query(Menu).all()
+
+    def agregar(self, db: Session, name: str, description: str, price: int):
+        menu_existente = db.query(Menu).filter(Menu.nombre == name).first()
+        menu = self.factory.crear_objeto()
+        # implementar
 
 # Función para ver todos los menús
 def ver_menus():
