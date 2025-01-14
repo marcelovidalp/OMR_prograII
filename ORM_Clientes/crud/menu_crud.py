@@ -1,5 +1,5 @@
 from sqlalchemy import Session, Menu
-from models import Menu
+from models import Menu, Ingredientes
 from crud_base import CRUDBase
 from factory import MenuFactory
 
@@ -10,53 +10,27 @@ class MenuCRUD(CRUDBase):
     def leer(self, db: Session):
         return db.query(Menu).all()
 
-    def agregar(self, db: Session, name: str, description: str, price: int):
-        menu_existente = db.query(Menu).filter(Menu.nombre == name).first()
+    def agregar(self, db: Session, name: str, description: str, price: int, ingredientes_name: list):
+        ingredientes_nes = []
+        for nombre in ingredientes_name:
+            ingrediente = db.query(Ingredientes).filter(Ingredientes.nombre == nombre).first()
+            if ingrediente:
+                ingredientes_nes.append(ingrediente)
+            if ingrediente.stock <= 0:
+                print(f"No hay stock suficiente de {ingrediente.nombre}")
+                return None
+            ingredientes_nes.append(ingrediente)
+
+        for ingrediente in ingredientes_nes:
+            ingrediente.stock -= 1
+
         menu = self.factory.crear_objeto()
-        # implementar
+        menu.nombre = name
+        menu.descripcion = description
+        menu.precio = price
+        menu.ingredientes = ingredientes_nes
 
-# Función para ver todos los menús
-def ver_menus():
-    menus = session.query(Menu).all()
-    if menus:
-        for menu in menus:
-            print(menu)
-    else:
-        print("No hay menus registrados")
-
-# Función para agregar un nuevo menú
-def agregar_menu():
-    #copilot
-    menu = Menu()
-    menu.nombre = input("Ingrese el nombre del menu: ")
-    menu.precio = float(input("Ingrese el precio del menu: "))
-    session.add(menu)
-    session.commit()
-    print("Menu agregado correctamente")
-
-# Función para modificar un menú existente
-def modificar_menu():
-    #copilot
-    ver_menus()
-    id_menu = int(input("Ingrese el ID del menu a modificar: "))
-    menu = session.query(Menu).get(id_menu)
-    if menu:
-        menu.nombre = input("Ingrese el nuevo nombre del menu: ")
-        menu.precio = float(input("Ingrese el nuevo precio del menu: "))
-        session.commit()
-        print("Menu modificado correctamente")
-    else:
-        print("Menu no encontrado")
-
-# Función para borrar un menú existente
-def borrar_menu():
-    #copilot
-    ver_menus()
-    id_menu = int(input("Ingrese el ID del menu a borrar: "))
-    menu = session.query(Menu).get(id_menu)
-    if menu:
-        session.delete(menu)
-        session.commit()
-        print("Menu eliminado correctamente")
-    else:
-        print("Menu no encontrado")
+        db.add(menu)
+        db.commit()
+        db.refresh(menu)
+        return menu

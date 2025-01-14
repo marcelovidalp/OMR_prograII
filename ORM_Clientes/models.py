@@ -9,13 +9,19 @@ pedido_ingredientes = Table(
     Column('ingrediente_id', Integer, ForeignKey('Ingredientes.id'), primary_key=True)
 )
 
+menu_ingredientes = Table(
+    'menu_ingredientes', Base.metadata,
+    Column('menu_id', Integer, ForeignKey('Menu.id'), primary_key=True),
+    Column('ingrediente_id', Integer, ForeignKey('Ingredientes.id'), primary_key=True)
+)
+
 # Definición de la clase Cliente que representa la tabla "Clientes"
 class Cliente(Base):
     __tablename__ = "Clientes"
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(index=True, unique=True)
     email: Mapped[str] = mapped_column(String(50), index=True, unique=True)
-
+    #relaciones
     pedidos = relationship("Pedido", back_populates="cliente")  # relación uno a muchos con la tabla "Pedidos"
 
 # Definición de la clase Pedido que representa la tabla "Pedidos"
@@ -25,7 +31,7 @@ class Pedido(Base):
     cliente_id: Mapped[int] = mapped_column(Integer, ForeignKey("Clientes.id"))
     descripcion: Mapped[str] = mapped_column(String(100), index=True)
     monto: Mapped[int] = mapped_column(Integer, index=True)
-
+    # relaciones
     cliente = relationship("Cliente", back_populates="pedidos")  # relación inversa con la tabla "Clientes"
     ingredientes = relationship("Ingredientes", secondary=pedido_ingredientes, back_populates="pedidos")  # relación muchos a muchos con la tabla "Ingredientes"
 
@@ -35,9 +41,9 @@ class Ingredientes(Base):
     id: Mapped[int] = mapped_column(primary_key=True, index=True)
     nombre: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     precio: Mapped[int] = mapped_column(Integer, index=True)
-
+    # relaciones
     pedidos = relationship("Pedido", secondary=pedido_ingredientes, back_populates="ingredientes")  # relación muchos a muchos con la tabla "Pedidos"
-
+    menus = relationship("Menu", secondary=menu_ingredientes, back_populates="ingredientes")  # relación muchos a muchos con la tabla "Menu"
 # Definición de la clase Menu que representa la tabla "Menu"
 class Menu(Base):
     __tablename__ = "Menu"
@@ -45,3 +51,6 @@ class Menu(Base):
     nombre: Mapped[str] = mapped_column(String(50), index=True, unique=True)
     descripcion: Mapped[str] = mapped_column(String(100), index=True)
     precio: Mapped[int] = mapped_column(Integer, index=True)
+    # relaciones
+    ingredientes = relationship("Ingredientes", secondary=menu_ingredientes, back_populates="menus")  # relación muchos a muchos con la tabla "Ingredientes"
+    
